@@ -52,8 +52,8 @@ const texts = {
     alert: "すべての値を正しく入力してください",
     result: {
       fatLoss: "必要な脂肪減少量",
-      kcalDeficit: "必要なアンダーカロリー（合計）",
-      perDay: "1日あたりの目安のアンダーカロリー",
+      kcalDeficit: "必要なカロリー赤字（合計）",
+      perDay: "1日あたりの目安カロリー赤字",
       estimatedDays: "週0.5kgペースの場合の目安日数"
     }
   },
@@ -102,7 +102,7 @@ function calculate() {
   const fatToLose = currentFatMass - targetFatMass;
   const kcalToBurn = fatToLose * 7200;
   const dailyDeficit = days ? kcalToBurn / days : null;
-  const estimatedDays = fatToLose / 0.5 * 7;
+  const estimatedWeeklyLoss = dailyDeficit ? (dailyDeficit * 7) / 7200 : null;
 
   const result = document.getElementById("result");
   const R = texts[lang].result;
@@ -111,7 +111,7 @@ function calculate() {
     <p><strong>${R.fatLoss}:</strong> ${fatToLose.toFixed(2)} kg</p>
     <p><strong>${R.kcalDeficit}:</strong> ${Math.round(kcalToBurn)} kcal</p>
     ${dailyDeficit ? `<p><strong>${R.perDay}:</strong> ${Math.round(dailyDeficit)} kcal/day</p>` : ""}
-    <p><strong>${R.estimatedDays}:</strong> 約 ${Math.round(estimatedDays)} 日</p>
+    ${estimatedWeeklyLoss ? `<p><strong>${R.estimatedDays}:</strong> 約 ${estimatedWeeklyLoss.toFixed(2)} kg/週</p>` : ""}
   `;
   result.style.display = "block";
 }
