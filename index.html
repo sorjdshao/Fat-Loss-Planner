@@ -1,0 +1,122 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>減量計画計算機 - 多言語対応</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: sans-serif; background: #f5f5f5; padding: 20px; }
+    .container { background: #fff; padding: 20px; border-radius: 10px; max-width: 600px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    input, select, button { width: 100%; padding: 10px; margin: 10px 0; font-size: 1em; }
+    button { background: #4CAF50; color: white; border: none; border-radius: 5px; }
+    .result { background: #eaffea; border-left: 5px solid #4CAF50; padding: 15px; margin-top: 20px; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <label for="language"><strong>Language / 言語:</strong></label>
+    <select id="language" onchange="changeLanguage()">
+      <option value="ja">日本語</option>
+      <option value="en">English</option>
+    </select><br><br>
+
+    <h1 id="title">減量計画計算機</h1>
+
+    <label id="label-weight">現在の体重（kg）</label>
+    <input type="number" id="weight">
+
+    <label id="label-bfp">現在の体脂肪率（%）</label>
+    <input type="number" id="currentBfp">
+
+    <label id="label-targetBfp">目標体脂肪率（%）</label>
+    <input type="number" id="targetBfp">
+
+    <label id="label-days">減量にかける日数（任意）</label>
+    <input type="number" id="days" placeholder="例: 60（任意）">
+
+    <button id="calcBtn" onclick="calculate()">計算する</button>
+
+    <div class="result" id="result" style="display:none;"></div>
+  </div>
+
+<script>
+const texts = {
+  ja: {
+    title: "減量計画計算機",
+    label_weight: "現在の体重（kg）",
+    label_bfp: "現在の体脂肪率（%）",
+    label_targetBfp: "目標体脂肪率（%）",
+    label_days: "減量にかける日数（任意）",
+    button: "計算する",
+    alert: "すべての値を正しく入力してください",
+    result: {
+      fatLoss: "必要な脂肪減少量",
+      kcalDeficit: "必要なカロリー赤字（合計）",
+      perDay: "1日あたりの目安カロリー赤字",
+      estimatedDays: "週0.5kgペースの場合の目安日数"
+    }
+  },
+  en: {
+    title: "Fat Loss Planner",
+    label_weight: "Current Weight (kg)",
+    label_bfp: "Current Body Fat (%)",
+    label_targetBfp: "Target Body Fat (%)",
+    label_days: "Days to Lose Fat (optional)",
+    button: "Calculate",
+    alert: "Please enter all values correctly",
+    result: {
+      fatLoss: "Required Fat Loss",
+      kcalDeficit: "Total Calorie Deficit Needed",
+      perDay: "Daily Calorie Deficit Target",
+      estimatedDays: "Estimated Days (0.5kg/week pace)"
+    }
+  }
+};
+
+function changeLanguage() {
+  const lang = document.getElementById("language").value;
+  document.documentElement.lang = lang;
+  document.getElementById("title").textContent = texts[lang].title;
+  document.getElementById("label-weight").textContent = texts[lang].label_weight;
+  document.getElementById("label-bfp").textContent = texts[lang].label_bfp;
+  document.getElementById("label-targetBfp").textContent = texts[lang].label_targetBfp;
+  document.getElementById("label-days").textContent = texts[lang].label_days;
+  document.getElementById("calcBtn").textContent = texts[lang].button;
+}
+
+function calculate() {
+  const lang = document.getElementById("language").value;
+  const weight = parseFloat(document.getElementById("weight").value);
+  const bfp = parseFloat(document.getElementById("currentBfp").value);
+  const targetBfp = parseFloat(document.getElementById("targetBfp").value);
+  const days = parseFloat(document.getElementById("days").value);
+
+  if (isNaN(weight) || isNaN(bfp) || isNaN(targetBfp)) {
+    alert(texts[lang].alert);
+    return;
+  }
+
+  const currentFatMass = weight * (bfp / 100);
+  const targetFatMass = weight * (targetBfp / 100);
+  const fatToLose = currentFatMass - targetFatMass;
+  const kcalToBurn = fatToLose * 7200;
+  const dailyDeficit = days ? kcalToBurn / days : null;
+  const estimatedDays = fatToLose / 0.5 * 7;
+
+  const result = document.getElementById("result");
+  const R = texts[lang].result;
+
+  result.innerHTML = `
+    <p><strong>${R.fatLoss}:</strong> ${fatToLose.toFixed(2)} kg</p>
+    <p><strong>${R.kcalDeficit}:</strong> ${Math.round(kcalToBurn)} kcal</p>
+    ${dailyDeficit ? `<p><strong>${R.perDay}:</strong> ${Math.round(dailyDeficit)} kcal/day</p>` : ""}
+    <p><strong>${R.estimatedDays}:</strong> 約 ${Math.round(estimatedDays)} 日</p>
+  `;
+  result.style.display = "block";
+}
+
+window.onload = changeLanguage;
+</script>
+</body>
+</html>
