@@ -31,6 +31,9 @@
     <label id="label-targetBfp">目標体脂肪率（%）</label>
     <input type="number" id="targetBfp">
 
+    <label id="label-tdee">1日の総消費カロリーTDEE（任意）</label>
+    <input type="number" id="tdee" placeholder="例: 2500（任意）">
+
     <label id="label-days">減量にかける日数（任意）</label>
     <input type="number" id="days" placeholder="例: 60（任意）">
 
@@ -46,6 +49,7 @@ const texts = {
     label_weight: "現在の体重（kg）",
     label_bfp: "現在の体脂肪率（%）",
     label_targetBfp: "目標体脂肪率（%）",
+    label_tdee: "1日の総消費カロリーTDEE（任意）",
     label_days: "減量にかける日数（任意）",
     button: "計算する",
     alert: "すべての値を正しく入力してください",
@@ -53,7 +57,9 @@ const texts = {
       fatLoss: "必要な脂肪減少量",
       kcalDeficit: "必要なアンダーカロリー（合計）",
       perDay: "1日あたりのアンダーカロリー",
-      estimatedDays: "このアンダーカロリーでの1週間あたりの減量ペース"
+      estimatedDays: "このアンダーカロリーでの1週間あたりの減量ペース",
+      tdee: "あなたのTDEE（総消費カロリー）",
+      targetIntake: "減量用目標摂取カロリー"
     }
   },
   en: {
@@ -61,6 +67,7 @@ const texts = {
     label_weight: "Current Weight (kg)",
     label_bfp: "Current Body Fat (%)",
     label_targetBfp: "Target Body Fat (%)",
+    label_tdee: "Daily TDEE (optional)",
     label_days: "Days to Lose Fat (optional)",
     button: "Calculate",
     alert: "Please enter all values correctly",
@@ -68,7 +75,9 @@ const texts = {
       fatLoss: "Required Fat Loss",
       kcalDeficit: "Total Calorie Deficit Needed",
       perDay: "Daily Calorie Deficit Target",
-      estimatedDays: "Estimated Weekly Fat Loss with This Deficit"
+      estimatedDays: "Estimated Weekly Fat Loss with This Deficit",
+      tdee: "Your TDEE (Total Daily Energy Expenditure)",
+      targetIntake: "Target Intake for Fat Loss"
     }
   }
 };
@@ -80,6 +89,7 @@ function changeLanguage() {
   document.getElementById("label-weight").textContent = texts[lang].label_weight;
   document.getElementById("label-bfp").textContent = texts[lang].label_bfp;
   document.getElementById("label-targetBfp").textContent = texts[lang].label_targetBfp;
+  document.getElementById("label-tdee").textContent = texts[lang].label_tdee;
   document.getElementById("label-days").textContent = texts[lang].label_days;
   document.getElementById("calcBtn").textContent = texts[lang].button;
 }
@@ -89,6 +99,7 @@ function calculate() {
   const weight = parseFloat(document.getElementById("weight").value);
   const bfp = parseFloat(document.getElementById("currentBfp").value);
   const targetBfp = parseFloat(document.getElementById("targetBfp").value);
+  const tdee = parseFloat(document.getElementById("tdee").value);
   const days = parseFloat(document.getElementById("days").value);
 
   if (isNaN(weight) || isNaN(bfp) || isNaN(targetBfp)) {
@@ -102,6 +113,7 @@ function calculate() {
   const kcalToBurn = fatToLose * 7200;
   const dailyDeficit = days ? kcalToBurn / days : null;
   const estimatedWeeklyLoss = dailyDeficit ? (dailyDeficit * 7) / 7200 : null;
+  const targetIntake = (dailyDeficit && tdee) ? tdee - dailyDeficit : null;
 
   const result = document.getElementById("result");
   const R = texts[lang].result;
@@ -111,6 +123,8 @@ function calculate() {
     <p><strong>${R.kcalDeficit}:</strong> ${Math.round(kcalToBurn)} kcal</p>
     ${dailyDeficit ? `<p><strong>${R.perDay}:</strong> ${Math.round(dailyDeficit)} kcal/day</p>` : ""}
     ${estimatedWeeklyLoss ? `<p><strong>${R.estimatedDays}:</strong> 約 ${estimatedWeeklyLoss.toFixed(2)} kg/週</p>` : ""}
+    ${tdee ? `<p><strong>${R.tdee}:</strong> ${Math.round(tdee)} kcal/day</p>` : ""}
+    ${targetIntake ? `<p><strong>${R.targetIntake}:</strong> ${Math.round(targetIntake)} kcal/day</p>` : ""}
   `;
   result.style.display = "block";
 }
